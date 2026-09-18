@@ -12,7 +12,7 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: DefaultCompany
+  companyName: RAS Studios
   productName: Neon Protocol
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
@@ -837,7 +837,7 @@ PlayerSettings:
   webProgressiveAssetLoading: 0
   scriptingDefineSymbols:
     Server: UNITY_SERVER;UGS_SERVER
-    Standalone: SENTIS_ANALYTICS_ENABLED
+    Standalone: SENTIS_ANALYTICS_ENABLED;APP_UI_EDITOR_ONLY
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
@@ -938,11 +938,11 @@ PlayerSettings:
   activeInputHandler: 1
   windowsGamepadBackendHint: 0
   enableDirectStorage: 0
-  cloudProjectId: 
+  cloudProjectId: 967a9a85-7e90-4d0b-9c47-0b18f12d39e0
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: FPSSample2
-  organizationId: 
+  projectName: Neon Protocol
+  organizationId: jarebyt
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
