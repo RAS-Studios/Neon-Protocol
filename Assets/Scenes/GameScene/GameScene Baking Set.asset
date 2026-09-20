@@ -12,6 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4881f9a2c4d568047b316028d20a8dca, type: 3}
   m_Name: GameScene Baking Set
   m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.ProbeVolumeBakingSet
+  m_SceneBakeData:
+    m_Keys:
+    - 6f586e48034994544a0532cc6f28cfdf
+    m_Values:
+    - hasProbeVolume: 1
+      bakeScene: 1
+      bounds:
+        m_Center: {x: 0, y: 0, z: 0}
+        m_Extent: {x: 81, y: 81, z: 81}
   singleSceneMode: 1
   dialogNoProbeVolumeInSetShown: 0
   settings:
@@ -37,7 +46,7 @@ MonoBehaviour:
   m_LightingScenarios:
   - Default
   cellDescs:
-    m_Keys: 030000000c000000040000000d000000
+    m_Keys: 030000000c000000040000000d000000i
     m_Values:
     - position: {x: -1, y: 0, z: -1}
       index: 3
@@ -97,13 +106,13 @@ MonoBehaviour:
         hasOnlyBiggerBricks: 0
   m_SerializedPerSceneCellList:
   - sceneGUID: 6f586e48034994544a0532cc6f28cfdf
-    cellList: 030000000c000000040000000d000000
+    cellList: 030000000c000000040000000d000000i
   cellSharedDataAsset:
     m_AssetGUID: 7b2f8b2079e5fd240acaa2f08c22f77a
     m_StreamableAssetPath: APVStreamingAssets\1a6596e3647013e4185f680be5823f47\7b2f8b2079e5fd240acaa2f08c22f77a.bytes
     m_ElementSize: 8192
     m_StreamableCellDescs:
-      m_Keys: 030000000c000000040000000d000000
+      m_Keys: 030000000c000000040000000d000000i
       m_Values:
       - offset: 0
         elementCount: 3
@@ -124,7 +133,7 @@ MonoBehaviour:
         m_StreamableAssetPath: APVStreamingAssets\1a6596e3647013e4185f680be5823f47\dbf0d94dc820bf446bfc58956eff2966.bytes
         m_ElementSize: 131072
         m_StreamableCellDescs:
-          m_Keys: 030000000c000000040000000d000000
+          m_Keys: 030000000c000000040000000d000000i
           m_Values:
           - offset: 0
             elementCount: 3
@@ -140,7 +149,7 @@ MonoBehaviour:
         m_StreamableAssetPath: APVStreamingAssets\1a6596e3647013e4185f680be5823f47\3bc7f0e7a981be2449a9ed189b0adebf.bytes
         m_ElementSize: 131072
         m_StreamableCellDescs:
-          m_Keys: 030000000c000000040000000d000000
+          m_Keys: 030000000c000000040000000d000000i
           m_Values:
           - offset: 0
             elementCount: 3
@@ -156,7 +165,7 @@ MonoBehaviour:
         m_StreamableAssetPath: APVStreamingAssets\1a6596e3647013e4185f680be5823f47\5c95a4591ceac0245ab5e3234e9a7377.bytes
         m_ElementSize: 32768
         m_StreamableCellDescs:
-          m_Keys: 030000000c000000040000000d000000
+          m_Keys: 030000000c000000040000000d000000i
           m_Values:
           - offset: 0
             elementCount: 3
@@ -172,7 +181,7 @@ MonoBehaviour:
     m_StreamableAssetPath: APVStreamingAssets\1a6596e3647013e4185f680be5823f47\16c62cbaf991b874ba6400fbcbda3942.bytes
     m_ElementSize: 16
     m_StreamableCellDescs:
-      m_Keys: 030000000c000000040000000d000000
+      m_Keys: 030000000c000000040000000d000000i
       m_Values:
       - offset: 0
         elementCount: 266
@@ -188,7 +197,7 @@ MonoBehaviour:
     m_StreamableAssetPath: APVStreamingAssets\1a6596e3647013e4185f680be5823f47\35842d055751e6a47983f62267c0d99d.bytes
     m_ElementSize: 262144
     m_StreamableCellDescs:
-      m_Keys: 030000000c000000040000000d000000
+      m_Keys: 030000000c000000040000000d000000i
       m_Values:
       - offset: 0
         elementCount: 3
@@ -250,12 +259,3 @@ MonoBehaviour:
   skyOcclusionShadingDirection: 0
   useRenderingLayers: 0
   renderingLayerMasks: []
-  m_SceneBakeData:
-    m_Keys:
-    - 6f586e48034994544a0532cc6f28cfdf
-    m_Values:
-    - hasProbeVolume: 1
-      bakeScene: 1
-      bounds:
-        m_Center: {x: 0, y: 0, z: 0}
-        m_Extent: {x: 81, y: 81, z: 81}
