@@ -145,6 +145,9 @@ public class FirstPersonController : MonoBehaviour
 
         public float TeleportFreeze;
 
+        public float DashTimeRemaining;
+        public float DashCooldownRemaining;
+
         //WARNING WARNING: Adding more members to this struct might break network serialisation speak to Claire/Andy B
 
         private void SetFlag(StateFlag flag, bool set)
@@ -165,6 +168,8 @@ public class FirstPersonController : MonoBehaviour
             CurrentRotation = worldRotation;
             MovementRequest = float3.zero;
             MovementSpeed = 0f;
+            DashTimeRemaining = 0f;
+            DashCooldownRemaining = 0f;
 
             Quaternion rot = worldRotation;
             PitchDegrees = rot.eulerAngles.y;
@@ -198,6 +203,9 @@ public class FirstPersonController : MonoBehaviour
         public float TerminalVelocity;
         public float GroundDeceleration;
         public float AirAcceleration;
+        public float DashSpeed;
+        public float DashDuration;
+        public float DashCooldown;
     }
 
     [field: Header("Cinemachine")]
@@ -726,14 +734,37 @@ public class FirstPersonController : MonoBehaviour
         inputMagnitude = inputMagnitude >= 0.15f ? math.min(inputMagnitude, 1f) : 0f;
         float targetSpeed = stateConsts.Speed * inputMagnitude;
         float3 targetVelocity = CalculateMovementFromInput(ref state, input, targetSpeed);
-        float acceleration = state.MovementType == MovementType.Standing
-            ? (inputMagnitude > 0f ? stateConsts.SpeedChangeRate : consts.GroundDeceleration)
-            : consts.AirAcceleration;
-        float3 velocityChange = targetVelocity - state.MovementRequest;
-        float changeLength = math.length(velocityChange);
-        if (changeLength > 0f)
+
+        state.DashCooldownRemaining = math.max(0f, state.DashCooldownRemaining - deltaTime);
+        if (input.Dash && state.DashCooldownRemaining <= 0f && state.TeleportFreeze <= 0f
+            && consts.DashSpeed > 0f && consts.DashDuration > 0f)
         {
-            state.MovementRequest += velocityChange * math.min(1f, acceleration * deltaTime / changeLength);
+            float3 localDashDirection = inputMagnitude > 0f
+                ? math.normalizesafe(new float3(input.MoveInput.x, 0f, input.MoveInput.y))
+                : k_ForwardVector;
+            float3 dashDirection = math.mul(state.CurrentRotation, localDashDirection);
+            state.MovementRequest = dashDirection * consts.DashSpeed;
+            state.DashTimeRemaining = consts.DashDuration;
+            state.DashCooldownRemaining = math.max(consts.DashCooldown, consts.DashDuration);
+        }
+
+        float horizontalDeltaTime = deltaTime;
+        if (state.DashTimeRemaining > 0f)
+        {
+            horizontalDeltaTime = math.min(deltaTime, state.DashTimeRemaining);
+            state.DashTimeRemaining = math.max(0f, state.DashTimeRemaining - deltaTime);
+        }
+        else
+        {
+            float acceleration = state.MovementType == MovementType.Standing
+                ? (inputMagnitude > 0f ? stateConsts.SpeedChangeRate : consts.GroundDeceleration)
+                : consts.AirAcceleration;
+            float3 velocityChange = targetVelocity - state.MovementRequest;
+            float changeLength = math.length(velocityChange);
+            if (changeLength > 0f)
+            {
+                state.MovementRequest += velocityChange * math.min(1f, acceleration * deltaTime / changeLength);
+            }
         }
 
         state.MovementSpeed = math.length(state.MovementRequest);
@@ -771,7 +802,10 @@ public class FirstPersonController : MonoBehaviour
                 break;
         }
 
-        accumulatedMovement += moveDelta * deltaTime;
+        accumulatedMovement += new float3(
+            moveDelta.x * horizontalDeltaTime,
+            moveDelta.y * deltaTime,
+            moveDelta.z * horizontalDeltaTime);
 
 #if DEBUG_RENDER_MOVEMENT
         Debug.DrawLine(state.CurrentPosition, state.CurrentPosition + accumulatedMovement, GetDebugColour(state.MovementType), k_DebugRenderingTimeout);

@@ -10,7 +10,8 @@ public struct PlayerInput
         Jump = 1 << 0,
         Shoot = 1 << 1,
         Reload = 1 << 3,
-        Sprint = 1 << 4
+        Sprint = 1 << 4,
+        Dash = 1 << 5
     }
 
     public float2 MoveInput;
@@ -22,6 +23,7 @@ public struct PlayerInput
     public bool Shoot => (InputFlags & (uint)InputFlag.Shoot) != 0;
     public bool Reload => (InputFlags & (uint)InputFlag.Reload) != 0;
     public bool Sprint => (InputFlags & (uint)InputFlag.Sprint) != 0;
+    public bool Dash => (InputFlags & (uint)InputFlag.Dash) != 0;
 
     public void SetFlag(InputFlag flag, bool set)
     {

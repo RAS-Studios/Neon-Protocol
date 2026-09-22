@@ -268,6 +268,9 @@ MonoBehaviour:
   <SprintSpeedChangeRate>k__BackingField: 65
   <GroundDeceleration>k__BackingField: 70
   <AirAcceleration>k__BackingField: 18
+  <DashSpeed>k__BackingField: 19
+  <DashDuration>k__BackingField: 0.16
+  <DashCooldown>k__BackingField: 0.8
   <SprintLandingSpeedMultiplier>k__BackingField: 10
   <SprintAnimationMotionScale>k__BackingField: 0.25
   <JumpHeight>k__BackingField: 1.35

@@ -34,6 +34,16 @@ public class PredictedPlayerControllerConstsAuthoring : MonoBehaviour
     [field: SerializeField, Tooltip("Air steering acceleration in m/s squared")]
     public float AirAcceleration { get; private set; } = 18f;
 
+    [field: Header("Dash")]
+    [field: SerializeField, Tooltip("Horizontal dash speed in m/s")]
+    public float DashSpeed { get; private set; } = 19f;
+
+    [field: SerializeField, Tooltip("Time spent dashing in seconds")]
+    public float DashDuration { get; private set; } = 0.16f;
+
+    [field: SerializeField, Tooltip("Time between dash starts in seconds")]
+    public float DashCooldown { get; private set; } = 0.8f;
+
     [field: SerializeField, Tooltip("Multiplier to player target speed during the landing animation timeout when sprinting")]
     public float SprintLandingSpeedMultiplier { get; private set; } = 0.6f;
 
@@ -101,6 +111,9 @@ public class PredictedPlayerControllerConstsBaker : Baker<PredictedPlayerControl
                 TerminalVelocity = authoring.TerminalVelocity,
                 GroundDeceleration = math.max(0f, authoring.GroundDeceleration),
                 AirAcceleration = math.max(0f, authoring.AirAcceleration),
+                DashSpeed = math.max(0f, authoring.DashSpeed),
+                DashDuration = math.max(0f, authoring.DashDuration),
+                DashCooldown = math.max(0f, authoring.DashCooldown),
 
                 Walk = new FirstPersonController.ControllerConsts.StateConsts
                 {
