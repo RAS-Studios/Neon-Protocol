@@ -712,6 +712,13 @@ public class FirstPersonController : MonoBehaviour
         return math.mul(state.CurrentRotation, localDir) * targetSpeed;
     }
 
+    private static float DashSpeedBlend(float progress)
+    {
+        float acceleration = math.smoothstep(0f, 0.1f, progress);
+        float deceleration = 1f - math.smoothstep(0.68f, 1f, progress);
+        return acceleration * deceleration;
+    }
+
     private static void AddMovementFromJumpFall(ref float3 moveDelta, in ControllerState state)
     {
         moveDelta.y += state.JumpFallSpeed;
@@ -743,15 +750,19 @@ public class FirstPersonController : MonoBehaviour
                 ? math.normalizesafe(new float3(input.MoveInput.x, 0f, input.MoveInput.y))
                 : k_ForwardVector;
             float3 dashDirection = math.mul(state.CurrentRotation, localDashDirection);
-            state.MovementRequest = dashDirection * consts.DashSpeed;
+            state.MovementRequest = dashDirection * math.max(targetSpeed, 0.01f);
             state.DashTimeRemaining = consts.DashDuration;
             state.DashCooldownRemaining = math.max(consts.DashCooldown, consts.DashDuration);
         }
 
-        float horizontalDeltaTime = deltaTime;
         if (state.DashTimeRemaining > 0f)
         {
-            horizontalDeltaTime = math.min(deltaTime, state.DashTimeRemaining);
+            float dashStep = math.min(deltaTime, state.DashTimeRemaining);
+            float dashProgress = 1f - (state.DashTimeRemaining - dashStep * 0.5f) / consts.DashDuration;
+            float dashSpeed = math.lerp(targetSpeed, consts.DashSpeed, DashSpeedBlend(dashProgress));
+            float3 dashDirection = math.normalizesafe(state.MovementRequest,
+                math.mul(state.CurrentRotation, k_ForwardVector));
+            state.MovementRequest = dashDirection * dashSpeed;
             state.DashTimeRemaining = math.max(0f, state.DashTimeRemaining - deltaTime);
         }
         else
@@ -802,10 +813,7 @@ public class FirstPersonController : MonoBehaviour
                 break;
         }
 
-        accumulatedMovement += new float3(
-            moveDelta.x * horizontalDeltaTime,
-            moveDelta.y * deltaTime,
-            moveDelta.z * horizontalDeltaTime);
+        accumulatedMovement += moveDelta * deltaTime;
 
 #if DEBUG_RENDER_MOVEMENT
         Debug.DrawLine(state.CurrentPosition, state.CurrentPosition + accumulatedMovement, GetDebugColour(state.MovementType), k_DebugRenderingTimeout);
