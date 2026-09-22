@@ -105,8 +105,8 @@ public partial class ClientInputReaderSystem : SystemBase
         playerInput.SetFlag(PlayerInput.InputFlag.Sprint, controls.Player.Sprint.IsPressed());
         playerInput.SetFlag(PlayerInput.InputFlag.Dash,
             controls.Player.Move.enabled && Keyboard.current != null
-            && (Keyboard.current.leftCtrlKey.wasPressedThisFrame
-                || Keyboard.current.rightCtrlKey.wasPressedThisFrame));
+            && (Keyboard.current.leftAltKey.wasPressedThisFrame
+                || Keyboard.current.rightAltKey.wasPressedThisFrame));
         playerInput.SetFlag(PlayerInput.InputFlag.Shoot, controls.FPS.ShootSingle.IsPressed());
         playerInput.SetFlag(PlayerInput.InputFlag.Reload, controls.FPS.Reload.triggered);
     }
