@@ -245,6 +245,8 @@ MonoBehaviour:
   <VisualShotOrigin3P>k__BackingField: {fileID: 5761123598763691873}
   m_Animator3P: {fileID: 9034346848951870918}
   <MainCameraPrefab>k__BackingField: {fileID: 8944336655422409498, guid: f6d148d888ffbf54b9afe9936dfaec1f, type: 3}
+  m_SprintFovBoost: 10
+  m_SprintFovBlendSpeed: 12
 --- !u!114 &1290565221828185357
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -257,23 +259,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6eb1f3325185fc43a4bb6f3d95ff636, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PredictedPlayerControllerConstsAuthoring
-  <WalkSpeed>k__BackingField: 4.7
-  <SprintSpeed>k__BackingField: 4.7
+  <WalkSpeed>k__BackingField: 7.5
+  <SprintSpeed>k__BackingField: 10.5
   <WalkRotationSmoothTime>k__BackingField: 0.1
   <WalkAnimationMotionScale>k__BackingField: 0.4
   <SprintRotationSmoothTime>k__BackingField: 0.08
-  <WalkSpeedChangeRate>k__BackingField: 10
-  <SprintSpeedChangeRate>k__BackingField: 10
+  <WalkSpeedChangeRate>k__BackingField: 55
+  <SprintSpeedChangeRate>k__BackingField: 65
+  <GroundDeceleration>k__BackingField: 70
+  <AirAcceleration>k__BackingField: 18
   <SprintLandingSpeedMultiplier>k__BackingField: 10
   <SprintAnimationMotionScale>k__BackingField: 0.25
-  <JumpHeight>k__BackingField: 1.2
-  <Gravity>k__BackingField: -18
+  <JumpHeight>k__BackingField: 1.35
+  <Gravity>k__BackingField: -25
   <TerminalVelocity>k__BackingField: -53
   <StandingFallSpeed>k__BackingField: -3.75
   <JumpTimeout>k__BackingField: 0
-  <FallTimeout>k__BackingField: 0.15
-  <LandingTimeout>k__BackingField: 0.15
-  <LandingAnimTimeout>k__BackingField: 0.4
+  <FallTimeout>k__BackingField: 0.08
+  <LandingTimeout>k__BackingField: 0.05
+  <LandingAnimTimeout>k__BackingField: 0.12
   <StateChangeSafetyTimeout>k__BackingField: 1
   <GroundedOffset>k__BackingField: 0.1
   <GroundLayers>k__BackingField:

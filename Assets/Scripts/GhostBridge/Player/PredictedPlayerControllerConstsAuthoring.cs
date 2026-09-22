@@ -7,10 +7,10 @@ public class PredictedPlayerControllerConstsAuthoring : MonoBehaviour
 {
     [field: Header("Player Movement Speeds")]
     [field: SerializeField, Tooltip("Walk speed of the character in m/s")]
-    public float WalkSpeed { get; private set; } = 2.35f;
+    public float WalkSpeed { get; private set; } = 7.5f;
 
     [field: SerializeField, Tooltip("Sprint speed of the character in m/s")]
-    public float SprintSpeed { get; private set; } = 4.7f;
+    public float SprintSpeed { get; private set; } = 10.5f;
 
     [field: Header("Player Rotation Smoothing Times")]
     [field: SerializeField, Tooltip("How fast the character turns to face movement direction while walking")]
@@ -23,10 +23,16 @@ public class PredictedPlayerControllerConstsAuthoring : MonoBehaviour
 
     [field: Header("Player Speed Change Rates")]
     [field: SerializeField, Tooltip("Acceleration and deceleration while walking")]
-    public float WalkSpeedChangeRate { get; private set; } = 10.0f;
+    public float WalkSpeedChangeRate { get; private set; } = 55f;
 
     [field: SerializeField, Tooltip("Acceleration and deceleration while sprinting")]
-    public float SprintSpeedChangeRate { get; private set; } = 10f;
+    public float SprintSpeedChangeRate { get; private set; } = 65f;
+
+    [field: SerializeField, Tooltip("Ground braking in m/s squared when movement input is released")]
+    public float GroundDeceleration { get; private set; } = 70f;
+
+    [field: SerializeField, Tooltip("Air steering acceleration in m/s squared")]
+    public float AirAcceleration { get; private set; } = 18f;
 
     [field: SerializeField, Tooltip("Multiplier to player target speed during the landing animation timeout when sprinting")]
     public float SprintLandingSpeedMultiplier { get; private set; } = 0.6f;
@@ -36,10 +42,10 @@ public class PredictedPlayerControllerConstsAuthoring : MonoBehaviour
     [field: Space(10)]
     [field: Header("Player Jumping and Gravity")]
     [field: SerializeField, Tooltip("The height the player can jump")]
-    public float JumpHeight { get; private set; } = 1.2f;
+    public float JumpHeight { get; private set; } = 1.35f;
 
     [field: SerializeField, Tooltip("The character uses its own gravity value. The engine default is -9.81f")]
-    public float Gravity { get; private set; } = -15.0f;
+    public float Gravity { get; private set; } = -25f;
 
     [field: SerializeField]
     public float TerminalVelocity { get; private set; } = -53.0f;
@@ -53,13 +59,13 @@ public class PredictedPlayerControllerConstsAuthoring : MonoBehaviour
     public float JumpTimeout { get; private set; } = 0.50f;
 
     [field: SerializeField, Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
-    public float FallTimeout { get; private set; } = 0.15f;
+    public float FallTimeout { get; private set; } = 0.08f;
 
     [field: SerializeField, Tooltip("Buffer time to continue applying gravity while in standing state, ensures player fully settles on the ground")]
-    public float LandingTimeout { get; private set; } = 0.15f;
+    public float LandingTimeout { get; private set; } = 0.05f;
 
     [field: SerializeField, Tooltip("Length of land animation for applying the landing speed multiplier and blocking turns")]
-    public float LandingAnimTimeout { get; private set; } = 0.4f;
+    public float LandingAnimTimeout { get; private set; } = 0.12f;
 
     [field: SerializeField, Tooltip("Time required to pass between movement state changes before batching is re-enabled")]
     public float StateChangeSafetyTimeout { get; private set; } = 0.3f;
@@ -93,6 +99,8 @@ public class PredictedPlayerControllerConstsBaker : Baker<PredictedPlayerControl
                 GroundedOffset = authoring.GroundedOffset,
                 GroundLayers = authoring.GroundLayers,
                 TerminalVelocity = authoring.TerminalVelocity,
+                GroundDeceleration = math.max(0f, authoring.GroundDeceleration),
+                AirAcceleration = math.max(0f, authoring.AirAcceleration),
 
                 Walk = new FirstPersonController.ControllerConsts.StateConsts
                 {

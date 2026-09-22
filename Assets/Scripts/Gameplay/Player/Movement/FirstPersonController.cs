@@ -121,7 +121,7 @@ public class FirstPersonController : MonoBehaviour
         public float3 CurrentPosition;
         public float3 GroundNormal;
 
-        public float3 MovementRequest;
+        public float3 MovementRequest; // Horizontal velocity, kept in predicted state for consistent steering.
         public MovementType MovementType;
         public MovementType PreviousMovementType;
         public float TimeInState;
@@ -163,6 +163,8 @@ public class FirstPersonController : MonoBehaviour
         {
             CurrentPosition = worldPosition;
             CurrentRotation = worldRotation;
+            MovementRequest = float3.zero;
+            MovementSpeed = 0f;
 
             Quaternion rot = worldRotation;
             PitchDegrees = rot.eulerAngles.y;
@@ -194,6 +196,8 @@ public class FirstPersonController : MonoBehaviour
         public float GroundedOffset;
         public LayerMask GroundLayers;
         public float TerminalVelocity;
+        public float GroundDeceleration;
+        public float AirAcceleration;
     }
 
     [field: Header("Cinemachine")]
@@ -680,7 +684,7 @@ public class FirstPersonController : MonoBehaviour
                 case MovementType.Standing:
                 case MovementType.Jumping:
                 case MovementType.Falling:
-                    stateConsts = consts.Walk;
+                    stateConsts = input.Sprint ? consts.Sprint : consts.Walk;
                     break;
                 default:
                     Debug.LogError(
@@ -690,28 +694,14 @@ public class FirstPersonController : MonoBehaviour
         }
     }
 
-    private static float3 CalculateMovementFromInput(ref ControllerState state, in ControllerConsts consts,
-        in ControllerConsts.StateConsts stateConsts, in PlayerInput input, bool updateRotation, float deltaTime)
+    private static float3 CalculateMovementFromInput(ref ControllerState state, in PlayerInput input, float targetSpeed)
     {
-        if (updateRotation)
-        {
-            state.YawDegrees = input.LookYawPitchDegrees.x;
-            state.PitchDegrees = input.LookYawPitchDegrees.y;
-            state.CurrentRotation = quaternion.RotateY(math.radians(state.YawDegrees));
-        }
-
-        var rotQuat = state.CurrentRotation; // Use the rotation already calculated above
+        state.YawDegrees = input.LookYawPitchDegrees.x;
+        state.PitchDegrees = input.LookYawPitchDegrees.y;
+        state.CurrentRotation = quaternion.RotateY(math.radians(state.YawDegrees));
         var localMove = new float3(input.MoveInput.x, 0f, input.MoveInput.y);
-
-        // Normalize it to get a pure direction vector with a length of 1.
-        // This is the crucial step.
         var localDir = math.normalizesafe(localMove);
-
-        // Rotate the pure direction by the character's facing rotation.
-        var worldDir = math.mul(rotQuat, localDir);
-
-        // Multiply the pure direction by the final speed calculated in AccumulateMovement.
-        return worldDir * state.MovementSpeed;
+        return math.mul(state.CurrentRotation, localDir) * targetSpeed;
     }
 
     private static void AddMovementFromJumpFall(ref float3 moveDelta, in ControllerState state)
@@ -732,37 +722,35 @@ public class FirstPersonController : MonoBehaviour
 
         GetStateConsts(out var stateConsts, ref state, in input, in consts, deltaTime);
 
-        var updateRotation = true;
-
-        float combinedMoveSpeedModifier = 1f;
-
-        float modifiedTargetMoveSpeed =
-            stateConsts.Speed * combinedMoveSpeedModifier; //don't apply modifiers to the aiming speed
-
         float inputMagnitude = math.length(input.MoveInput);
+        inputMagnitude = inputMagnitude >= 0.15f ? math.min(inputMagnitude, 1f) : 0f;
+        float targetSpeed = stateConsts.Speed * inputMagnitude;
+        float3 targetVelocity = CalculateMovementFromInput(ref state, input, targetSpeed);
+        float acceleration = state.MovementType == MovementType.Standing
+            ? (inputMagnitude > 0f ? stateConsts.SpeedChangeRate : consts.GroundDeceleration)
+            : consts.AirAcceleration;
+        float3 velocityChange = targetVelocity - state.MovementRequest;
+        float changeLength = math.length(velocityChange);
+        if (changeLength > 0f)
+        {
+            state.MovementRequest += velocityChange * math.min(1f, acceleration * deltaTime / changeLength);
+        }
 
-        // apply analog deadzone
-        inputMagnitude = inputMagnitude >= 0.4f ? 1f : 0f;
-
-        float applyTargetSpeed = modifiedTargetMoveSpeed * inputMagnitude;
-        float blendAlpha = deltaTime * stateConsts.SpeedChangeRate;
-
-        state.MovementSpeed = applyTargetSpeed;
+        state.MovementSpeed = math.length(state.MovementRequest);
         state.AnimatorTargetSpeedChangeRate = stateConsts.SpeedChangeRate;
-        state.AnimatorTargetSpeed = stateConsts.Speed * inputMagnitude;
-        state.AnimatorMotionSpeed = inputMagnitude > 0f ? state.MovementSpeed : 1f; //play the idle at 1x
+        state.AnimatorTargetSpeed = state.MovementSpeed;
+        state.AnimatorMotionSpeed = state.MovementSpeed > 0f ? state.MovementSpeed : 1f;
 
         state.AnimatorMotion = float3.zero;
         state.AnimatorMotionChangeRate = 0f;
 
         var moveDelta = float3.zero;
-        updateRotation &= applyTargetSpeed > 0f;
 
         switch (state.MovementType)
         {
             case MovementType.Standing:
                 {
-                    moveDelta = CalculateMovementFromInput(ref state, consts, stateConsts, input, true, deltaTime);
+                    moveDelta = state.MovementRequest;
                     AddMovementFromJumpFall(ref moveDelta, state);
                 }
                 break;
@@ -770,7 +758,7 @@ public class FirstPersonController : MonoBehaviour
             case MovementType.Jumping:
             case MovementType.Falling:
                 {
-                    moveDelta = CalculateMovementFromInput(ref state, consts, stateConsts, input, true, deltaTime);
+                    moveDelta = state.MovementRequest;
                     AddMovementFromJumpFall(ref moveDelta, state);
                 }
                 break;
@@ -784,7 +772,6 @@ public class FirstPersonController : MonoBehaviour
         }
 
         accumulatedMovement += moveDelta * deltaTime;
-        state.MovementRequest = accumulatedMovement;
 
 #if DEBUG_RENDER_MOVEMENT
         Debug.DrawLine(state.CurrentPosition, state.CurrentPosition + accumulatedMovement, GetDebugColour(state.MovementType), k_DebugRenderingTimeout);

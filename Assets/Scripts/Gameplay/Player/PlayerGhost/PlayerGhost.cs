@@ -41,7 +41,12 @@ namespace Unity.MP_FPS
 
         [field: SerializeField] public GameObject MainCameraPrefab { get; private set; }
 
+        [Header("Sprint Camera Effect")]
+        [SerializeField, Min(0f)] private float m_SprintFovBoost = 10f;
+        [SerializeField, Min(0f)] private float m_SprintFovBlendSpeed = 12f;
+
         private Camera m_PlayerCamera;
+        private float m_BasePlayerFov;
         private Animator _animatorCharacter;
         private Vector3 m_ReticleVector;
 
@@ -189,6 +194,7 @@ namespace Unity.MP_FPS
             mainCameraInstance.name = $"MainCamera_{PlayerIndex}";
 
             m_PlayerCamera = mainCameraInstance.GetComponent<Camera>();
+            m_BasePlayerFov = m_PlayerCamera.fieldOfView;
 
             var audioListener = mainCameraInstance.GetComponent<AudioListener>();
             if (audioListener != null)
@@ -213,6 +219,7 @@ namespace Unity.MP_FPS
                 CameraTarget.transform.rotation = Quaternion.Euler(controllerState.PitchDegrees,
                     Camera.main.transform.rotation.eulerAngles.y,
                     Camera.main.transform.rotation.eulerAngles.z);
+                UpdateSprintCamera(controllerState.MovementSpeed, deltaTime);
             }
 
             var rot = Quaternion.Euler(controllerState.PitchDegrees, 0.0f, 0.0f);
@@ -221,6 +228,22 @@ namespace Unity.MP_FPS
             //TODO: The following is a temporary fix for animation root moves (Robot Jump for example)
             m_OtherPlayerVisuals.transform.localPosition = Vector3.zero;
             m_OtherPlayerVisuals.transform.localRotation = Quaternion.identity;
+        }
+
+        private void UpdateSprintCamera(float movementSpeed, float deltaTime)
+        {
+            if (m_PlayerCamera == null)
+            {
+                return;
+            }
+
+            var inputUser = InputSystemManager.GetFirstInputUser();
+            bool sprinting = inputUser.valid
+                && ((InputSystem_Actions)inputUser.actions).Player.Sprint.IsPressed()
+                && movementSpeed > 0.5f;
+            float targetFov = m_BasePlayerFov + (sprinting ? m_SprintFovBoost : 0f);
+            float blend = 1f - Mathf.Exp(-m_SprintFovBlendSpeed * deltaTime);
+            m_PlayerCamera.fieldOfView = Mathf.Lerp(m_PlayerCamera.fieldOfView, targetFov, blend);
         }
 
         public bool SetPlayerPositionFromRPC(float3 rpcPosition, float positionErrorSq)
