@@ -43,6 +43,7 @@ namespace Unity.MP_FPS
 
         [Header("Sprint Camera Effect")]
         [SerializeField, Min(0f)] private float m_SprintFovBoost = 10f;
+        [SerializeField, Min(0f)] private float m_DashFovBoost = 6f;
         [SerializeField, Min(0f)] private float m_SprintFovBlendSpeed = 12f;
 
         private Camera m_PlayerCamera;
@@ -219,7 +220,8 @@ namespace Unity.MP_FPS
                 CameraTarget.transform.rotation = Quaternion.Euler(controllerState.PitchDegrees,
                     Camera.main.transform.rotation.eulerAngles.y,
                     Camera.main.transform.rotation.eulerAngles.z);
-                UpdateSprintCamera(controllerState.MovementSpeed, deltaTime);
+                UpdateSprintCamera(controllerState.MovementSpeed,
+                    controllerState.DashTimeRemaining > 0f, deltaTime);
             }
 
             var rot = Quaternion.Euler(controllerState.PitchDegrees, 0.0f, 0.0f);
@@ -230,7 +232,7 @@ namespace Unity.MP_FPS
             m_OtherPlayerVisuals.transform.localRotation = Quaternion.identity;
         }
 
-        private void UpdateSprintCamera(float movementSpeed, float deltaTime)
+        private void UpdateSprintCamera(float movementSpeed, bool dashing, float deltaTime)
         {
             if (m_PlayerCamera == null)
             {
@@ -241,7 +243,8 @@ namespace Unity.MP_FPS
             bool sprinting = inputUser.valid
                 && ((InputSystem_Actions)inputUser.actions).Player.Sprint.IsPressed()
                 && movementSpeed > 0.5f;
-            float targetFov = m_BasePlayerFov + (sprinting ? m_SprintFovBoost : 0f);
+            float targetFov = m_BasePlayerFov + (sprinting ? m_SprintFovBoost : 0f)
+                + (dashing ? m_DashFovBoost : 0f);
             float blend = 1f - Mathf.Exp(-m_SprintFovBlendSpeed * deltaTime);
             m_PlayerCamera.fieldOfView = Mathf.Lerp(m_PlayerCamera.fieldOfView, targetFov, blend);
         }

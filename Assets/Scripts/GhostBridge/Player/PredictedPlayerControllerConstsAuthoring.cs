@@ -36,13 +36,13 @@ public class PredictedPlayerControllerConstsAuthoring : MonoBehaviour
 
     [field: Header("Dash")]
     [field: SerializeField, Tooltip("Horizontal dash speed in m/s")]
-    public float DashSpeed { get; private set; } = 19f;
+    public float DashSpeed { get; private set; } = 30f;
 
     [field: SerializeField, Tooltip("Time spent dashing in seconds")]
-    public float DashDuration { get; private set; } = 0.16f;
+    public float DashDuration { get; private set; } = 0.22f;
 
     [field: SerializeField, Tooltip("Time between dash starts in seconds")]
-    public float DashCooldown { get; private set; } = 0.8f;
+    public float DashCooldown { get; private set; } = 0.65f;
 
     [field: SerializeField, Tooltip("Multiplier to player target speed during the landing animation timeout when sprinting")]
     public float SprintLandingSpeedMultiplier { get; private set; } = 0.6f;

@@ -246,6 +246,7 @@ MonoBehaviour:
   m_Animator3P: {fileID: 9034346848951870918}
   <MainCameraPrefab>k__BackingField: {fileID: 8944336655422409498, guid: f6d148d888ffbf54b9afe9936dfaec1f, type: 3}
   m_SprintFovBoost: 10
+  m_DashFovBoost: 6
   m_SprintFovBlendSpeed: 12
 --- !u!114 &1290565221828185357
 MonoBehaviour:
@@ -268,9 +269,9 @@ MonoBehaviour:
   <SprintSpeedChangeRate>k__BackingField: 65
   <GroundDeceleration>k__BackingField: 70
   <AirAcceleration>k__BackingField: 18
-  <DashSpeed>k__BackingField: 19
-  <DashDuration>k__BackingField: 0.16
-  <DashCooldown>k__BackingField: 0.8
+  <DashSpeed>k__BackingField: 30
+  <DashDuration>k__BackingField: 0.22
+  <DashCooldown>k__BackingField: 0.65
   <SprintLandingSpeedMultiplier>k__BackingField: 10
   <SprintAnimationMotionScale>k__BackingField: 0.25
   <JumpHeight>k__BackingField: 1.35

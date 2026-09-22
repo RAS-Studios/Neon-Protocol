@@ -147,6 +147,7 @@ public class FirstPersonController : MonoBehaviour
 
         public float DashTimeRemaining;
         public float DashCooldownRemaining;
+        public float DashExitSpeed;
 
         //WARNING WARNING: Adding more members to this struct might break network serialisation speak to Claire/Andy B
 
@@ -170,6 +171,7 @@ public class FirstPersonController : MonoBehaviour
             MovementSpeed = 0f;
             DashTimeRemaining = 0f;
             DashCooldownRemaining = 0f;
+            DashExitSpeed = 0f;
 
             Quaternion rot = worldRotation;
             PitchDegrees = rot.eulerAngles.y;
@@ -714,8 +716,8 @@ public class FirstPersonController : MonoBehaviour
 
     private static float DashSpeedBlend(float progress)
     {
-        float acceleration = math.smoothstep(0f, 0.1f, progress);
-        float deceleration = 1f - math.smoothstep(0.68f, 1f, progress);
+        float acceleration = math.smoothstep(0f, 0.07f, progress);
+        float deceleration = 1f - math.smoothstep(0.78f, 1f, progress);
         return acceleration * deceleration;
     }
 
@@ -750,7 +752,8 @@ public class FirstPersonController : MonoBehaviour
                 ? math.normalizesafe(new float3(input.MoveInput.x, 0f, input.MoveInput.y))
                 : k_ForwardVector;
             float3 dashDirection = math.mul(state.CurrentRotation, localDashDirection);
-            state.MovementRequest = dashDirection * math.max(targetSpeed, 0.01f);
+            state.DashExitSpeed = math.max(targetSpeed, math.length(state.MovementRequest));
+            state.MovementRequest = dashDirection * math.max(state.DashExitSpeed, 0.01f);
             state.DashTimeRemaining = consts.DashDuration;
             state.DashCooldownRemaining = math.max(consts.DashCooldown, consts.DashDuration);
         }
@@ -759,7 +762,9 @@ public class FirstPersonController : MonoBehaviour
         {
             float dashStep = math.min(deltaTime, state.DashTimeRemaining);
             float dashProgress = 1f - (state.DashTimeRemaining - dashStep * 0.5f) / consts.DashDuration;
-            float dashSpeed = math.lerp(targetSpeed, consts.DashSpeed, DashSpeedBlend(dashProgress));
+            float baseSpeed = math.max(targetSpeed, state.DashExitSpeed);
+            float dashSpeed = math.lerp(baseSpeed, math.max(baseSpeed, consts.DashSpeed),
+                DashSpeedBlend(dashProgress));
             float3 dashDirection = math.normalizesafe(state.MovementRequest,
                 math.mul(state.CurrentRotation, k_ForwardVector));
             state.MovementRequest = dashDirection * dashSpeed;
